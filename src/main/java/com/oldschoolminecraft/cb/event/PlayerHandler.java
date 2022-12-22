@@ -36,7 +36,7 @@ public class PlayerHandler extends PlayerListener
             obj.put("secret", plugin.config.getStringOption("settings.chat.relaySecret"));
             obj.put("message", chatFormat
                     .replace("{server}", plugin.config.getStringOption("settings.server.serverName"))
-                    .replace("{player}", event.getPlayer().getName())
+                    .replace("{player}", event.getPlayer().getDisplayName())
                     .replace("{message}", event.getMessage()));
             dos.writeUTF(obj.toJSONString());
         } catch (Exception ex) {
