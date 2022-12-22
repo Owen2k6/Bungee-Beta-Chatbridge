@@ -1,5 +1,6 @@
 package com.oldschoolminecraft.cb;
 
+import com.oldschoolminecraft.cb.event.PlayerHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.DataInputStream;
@@ -31,10 +32,13 @@ public class BukkitPlugin extends JavaPlugin
                 } catch (Exception ignored) {}
             }, 0,  6000); // 6000 ticks = 5 minutes
 
+            getServer().getPluginManager().registerEvents(new PlayerHandler(this, socket, dis, dos), this);
+
             System.out.println("Chat bridge connected to relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
         } catch (Exception ex) {
             System.out.println("Chat bridge failed to connect to relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
             System.out.println("Chat bridge has been disabled due to an error: " + ex.getMessage());
+            getServer().getPluginManager().disablePlugin(this);
             ex.printStackTrace();
         }
     }
