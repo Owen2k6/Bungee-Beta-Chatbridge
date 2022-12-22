@@ -1,6 +1,5 @@
 package com.oldschoolminecraft.cb;
 
-import com.oldschoolminecraft.cb.net.bukkit.KeepAliveThread;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.DataInputStream;
@@ -24,7 +23,13 @@ public class BukkitPlugin extends JavaPlugin
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
 
-            new KeepAliveThread(this, socket, dos).start();
+            getServer().getScheduler().scheduleSyncRepeatingTask(this, () ->
+            {
+                try
+                {
+                    if (socket.isConnected()) dos.writeUTF("!ping");
+                } catch (Exception ignored) {}
+            }, 0,  6000); // 6000 ticks = 5 minutes
 
             System.out.println("Chat bridge connected to relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
         } catch (Exception ex) {
