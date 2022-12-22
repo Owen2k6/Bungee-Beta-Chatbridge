@@ -9,5 +9,4 @@ repositories {
 dependencies {
     implementation files("libs/poseidon.jar")
     implementation files("libs/BungeeCord.jar")
-    implementation group: 'org.pircbotx', name: 'pircbotx', version: '2.1'
 }
