@@ -5,6 +5,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,7 +14,7 @@ import java.net.Socket;
 
 public class BungeePlugin extends Plugin implements Listener
 {
-    private PLConfig config;
+    public PLConfig config;
     private ServerSocket serverSocket;
     private Thread socketReadThread;
 
@@ -26,7 +27,7 @@ public class BungeePlugin extends Plugin implements Listener
             serverSocket = new ServerSocket();
             serverSocket.bind(new InetSocketAddress(config.getStringOption("settings.chat.relayHost", "0.0.0.0"), (int) config.getConfigOption("settings.chat.relayPort", 8182)));
 
-
+            socketReadThread = new ConnectionHandlerThread(serverSocket);
             socketReadThread.start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,5 +40,13 @@ public class BungeePlugin extends Plugin implements Listener
     public void onDisable()
     {
         //
+    }
+
+    public String generatePluginMessage(String message)
+    {
+        JSONObject obj = new JSONObject();
+        obj.put("secret", config.getStringOption("settings.chat.relaySecret"));
+        obj.put("message", message);
+        return obj.toJSONString();
     }
 }
