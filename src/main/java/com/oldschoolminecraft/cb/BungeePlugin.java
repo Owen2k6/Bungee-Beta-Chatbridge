@@ -27,7 +27,7 @@ public class BungeePlugin extends Plugin implements Listener
             serverSocket = new ServerSocket();
             serverSocket.bind(new InetSocketAddress(config.getStringOption("settings.chat.relayHost", "0.0.0.0"), (int) config.getConfigOption("settings.chat.relayPort", 8182)));
 
-            socketReadThread = new ConnectionHandlerThread(serverSocket);
+            socketReadThread = new ConnectionHandlerThread(this, serverSocket);
             socketReadThread.start();
         } catch (IOException e) {
             e.printStackTrace();

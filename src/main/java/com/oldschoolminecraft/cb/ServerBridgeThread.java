@@ -44,6 +44,10 @@ public class ServerBridgeThread extends Thread
                     socket.close();
                     return;
                 }
+
+                plugin.getProxy().getServers().values().forEach(server ->
+                        server.getPlayers().forEach(player ->
+                                player.sendMessage(message)));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
