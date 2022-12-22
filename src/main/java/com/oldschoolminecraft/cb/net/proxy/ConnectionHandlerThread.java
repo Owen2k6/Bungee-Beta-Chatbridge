@@ -1,4 +1,6 @@
-package com.oldschoolminecraft.cb;
+package com.oldschoolminecraft.cb.net.proxy;
+
+import com.oldschoolminecraft.cb.BungeePlugin;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,7 +23,7 @@ public class ConnectionHandlerThread extends Thread
             while (!serverSocket.isClosed())
             {
                 Socket socket = serverSocket.accept();
-                new ServerBridgeThread(plugin, socket).start();
+                new ProxyBridgeThread(plugin, socket).start();
             }
         } catch (Exception ex) {
             ex.printStackTrace();

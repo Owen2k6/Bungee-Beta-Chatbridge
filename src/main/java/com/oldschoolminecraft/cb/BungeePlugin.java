@@ -1,8 +1,6 @@
 package com.oldschoolminecraft.cb;
 
-import com.google.common.eventbus.Subscribe;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.ChatEvent;
+import com.oldschoolminecraft.cb.net.proxy.ConnectionHandlerThread;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.json.simple.JSONObject;
@@ -10,7 +8,6 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 public class BungeePlugin extends Plugin implements Listener
 {
@@ -34,12 +31,14 @@ public class BungeePlugin extends Plugin implements Listener
         }
 
         getProxy().getPluginManager().registerListener(this, this);
+
+        System.out.println("Bungee-Beta-Chatbridge enabled!");
     }
 
     @Override
     public void onDisable()
     {
-        //
+        System.out.println("Bungee-Beta-Chatbridge disabled!");
     }
 
     public String generatePluginMessage(String message)
