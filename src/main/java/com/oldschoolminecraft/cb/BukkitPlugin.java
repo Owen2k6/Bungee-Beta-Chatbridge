@@ -20,9 +20,11 @@ public class BukkitPlugin extends JavaPlugin
         try
         {
             config = new PLConfig();
-            socket = new Socket("localhost", 8182);
+            socket = new Socket(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort"));
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
+
+            dos.writeUTF("!login " + config.getStringOption("settings.chat.relaySecret"));
 
             getServer().getScheduler().scheduleSyncRepeatingTask(this, () ->
             {

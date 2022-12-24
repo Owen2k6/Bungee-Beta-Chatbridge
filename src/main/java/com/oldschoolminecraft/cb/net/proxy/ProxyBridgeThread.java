@@ -14,6 +14,7 @@ public class ProxyBridgeThread extends Thread
     private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
+    private boolean loggedIn = false;
 
     public ProxyBridgeThread(BungeePlugin plugin, Socket socket)
     {
@@ -35,28 +36,37 @@ public class ProxyBridgeThread extends Thread
             while (socket.isConnected())
             {
                 String rawMessage = dis.readUTF();
-                if (rawMessage.startsWith("!"))
+                String[] split = rawMessage.split(" ");
+                switch (split[0])
                 {
-                    String[] split = rawMessage.split(" ");
-                    if (split[0].equals("!ping"))
-                        dos.writeUTF("!pong"); // response to Keep-Alive
-                    continue;
-                }
+                    default:
+                        dos.writeUTF("ERROR Unknown command");
+                        break;
+                    case "PING":
+                        dos.writeUTF("PONG");
+                        break;
+                    case "CHAT":
+                        if (!loggedIn)
+                        {
+                            dos.writeUTF("ERROR Not logged in");
+                            break;
+                        }
 
-                JSONParser parser = new JSONParser();
-                JSONObject obj = (JSONObject) parser.parse(rawMessage);
-                String secret = String.valueOf(obj.get("secret"));
-                String message = String.valueOf(obj.get("message"));
-                if (!secret.equals(plugin.config.getStringOption("settings.chat.relaySecret")))
-                {
-                    dos.writeUTF(plugin.generatePluginMessage("Invalid secret"));
-                    socket.close();
-                    return;
-                }
+                        if (split.length < 2)
+                        {
+                            dos.writeUTF("ERROR Missing arguments");
+                            break;
+                        }
 
-                plugin.getProxy().getServers().values().forEach(server ->
-                        server.getPlayers().forEach(player ->
-                                player.sendMessage(message)));
+                        StringBuilder message = new StringBuilder();
+                        for (int i = 1; i < split.length; i++)
+                            message.append(split[i]).append(" ");
+
+                        plugin.getProxy().getServers().values().forEach(server ->
+                                server.getPlayers().forEach(player ->
+                                        player.sendMessage(message.toString())));
+                        break;
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();

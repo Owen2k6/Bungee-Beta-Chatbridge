@@ -32,13 +32,19 @@ public class BungeePlugin extends Plugin implements Listener
 
         getProxy().getPluginManager().registerListener(this, this);
 
-        System.out.println("Bungee-Beta-Chatbridge enabled!");
+        System.out.println("Chat bridge relay listening on " + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort());
     }
 
     @Override
     public void onDisable()
     {
-        System.out.println("Bungee-Beta-Chatbridge disabled!");
+        try
+        {
+            serverSocket.close();
+            System.out.println("Chat bridge relay closed!");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public String generatePluginMessage(String message)
