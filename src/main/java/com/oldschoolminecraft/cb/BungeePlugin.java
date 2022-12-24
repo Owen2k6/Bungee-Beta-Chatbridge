@@ -16,7 +16,7 @@ public class BungeePlugin extends Plugin implements Listener
 {
     public PLConfig config;
     private ServerSocket serverSocket;
-    private Thread socketReadThread;
+    private ConnectionHandlerThread socketReadThread;
 
     @Override
     public void onEnable()

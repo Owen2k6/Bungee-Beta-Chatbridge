@@ -70,17 +70,13 @@ public class ProxyBridgeThread extends Thread
                             break;
                         }
 
-                        if (split.length < 2)
-                        {
-                            dos.writeUTF("ERROR Missing arguments");
-                            break;
-                        }
-
                         StringBuilder message = new StringBuilder();
                         for (int i = 1; i < split.length; i++)
                             message.append(split[i]).append(" ");
 
                         System.out.println("Relay CHAT: " + message);
+
+                        //
 
                         plugin.getProxy().getServers().values().forEach(server ->
                                 server.getPlayers().forEach(player ->

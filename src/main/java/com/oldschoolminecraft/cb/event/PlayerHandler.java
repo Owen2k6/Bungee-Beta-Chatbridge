@@ -32,12 +32,8 @@ public class PlayerHandler extends PlayerListener
     {
         try
         {
-            String chatFormat = plugin.config.getStringOption("settings.chat.chatFormat");
-
-            dos.writeUTF("CHAT " + chatFormat
-                    .replace("{server}", plugin.config.getStringOption("settings.server.serverName"))
-                    .replace("{player}", event.getPlayer().getDisplayName())
-                    .replace("{message}", event.getMessage()) + "\n");
+            String protoMsg = String.format("CHAT %s %s %s", plugin.config.getConfigOption("settings.server.serverName"), event.getPlayer().getDisplayName(), event.getMessage());
+            dos.writeUTF(protoMsg);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
