@@ -45,6 +45,16 @@ public class ProxyBridgeThread extends Thread
                     case "PING":
                         dos.writeUTF("PONG\n");
                         break;
+                    case "LOGIN":
+                        String secret = split[1];
+                        if (secret.equals(plugin.config.getStringOption("settings.chat.relaySecret")))
+                        {
+                            loggedIn = true;
+                            dos.writeUTF("LOGIN_SUCCESS\n");
+                        } else {
+                            dos.writeUTF("LOGIN_FAILED\n");
+                        }
+                        break;
                     case "CHAT":
                         if (!loggedIn)
                         {

@@ -3,6 +3,9 @@ package com.oldschoolminecraft.cb;
 import com.oldschoolminecraft.cb.net.proxy.ConnectionHandlerThread;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
@@ -33,6 +36,40 @@ public class BungeePlugin extends Plugin implements Listener
         getProxy().getPluginManager().registerListener(this, this);
 
         System.out.println("Chat bridge relay listening on " + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort());
+    }
+
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
+    {
+        if (cmd.getName().equalsIgnoreCase("chatbridge"))
+        {
+            if (!sender.hasPermission("chatbridge.admin"))
+            {
+                sender.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+                return true;
+            }
+
+            if (args.length == 0)
+            {
+                sender.sendMessage(ChatColor.DARK_GRAY + "Host: " + ChatColor.GRAY + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort());
+                sender.sendMessage(ChatColor.BLUE + "Status: " + (serverSocket.isClosed() ? ChatColor.RED + "Closed" : ChatColor.GREEN + "Open"));
+                return true;
+            }
+
+            if (args[0].equalsIgnoreCase("reload"))
+            {
+                config.reload();
+                sender.sendMessage("Chat bridge config reloaded");
+                return true;
+            }
+
+            if (args[0].equalsIgnoreCase("disable"))
+            {
+                //getProxy().getPluginManager().disablePlugin(this);
+                //sender.sendMessage("Chat bridge disabled");
+                return true;
+            }
+        }
+        return true;
     }
 
     @Override
