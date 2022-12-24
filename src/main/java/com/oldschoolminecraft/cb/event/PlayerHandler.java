@@ -34,16 +34,10 @@ public class PlayerHandler extends PlayerListener
         {
             String chatFormat = plugin.config.getStringOption("settings.chat.chatFormat");
 
-            JSONObject obj = new JSONObject();
-            obj.put("secret", plugin.config.getStringOption("settings.chat.relaySecret"));
-            obj.put("message", chatFormat
+            dos.writeUTF("CHAT " + chatFormat
                     .replace("{server}", plugin.config.getStringOption("settings.server.serverName"))
                     .replace("{player}", event.getPlayer().getDisplayName())
-                    .replace("{message}", event.getMessage()));
-            dos.writeUTF("!chat " + chatFormat
-                    .replace("{server}", plugin.config.getStringOption("settings.server.serverName"))
-                    .replace("{player}", event.getPlayer().getDisplayName())
-                    .replace("{message}", event.getMessage()));
+                    .replace("{message}", event.getMessage()) + "\n");
         } catch (Exception ex) {
             ex.printStackTrace();
         }

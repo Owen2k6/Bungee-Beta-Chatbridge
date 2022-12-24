@@ -30,7 +30,7 @@ public class BukkitPlugin extends JavaPlugin
             {
                 try
                 {
-                    if (socket.isConnected()) dos.writeUTF("!ping");
+                    if (socket.isConnected()) dos.writeUTF("PING");
                 } catch (Exception ignored) {}
             }, 0,  6000); // 6000 ticks = 5 minutes
 

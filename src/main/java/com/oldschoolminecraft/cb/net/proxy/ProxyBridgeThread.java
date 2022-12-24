@@ -40,21 +40,21 @@ public class ProxyBridgeThread extends Thread
                 switch (split[0])
                 {
                     default:
-                        dos.writeUTF("ERROR Unknown command");
+                        dos.writeUTF("ERROR Unknown command\n");
                         break;
                     case "PING":
-                        dos.writeUTF("PONG");
+                        dos.writeUTF("PONG\n");
                         break;
                     case "CHAT":
                         if (!loggedIn)
                         {
-                            dos.writeUTF("ERROR Not logged in");
+                            dos.writeUTF("ERROR Not logged in\n");
                             break;
                         }
 
                         if (split.length < 2)
                         {
-                            dos.writeUTF("ERROR Missing arguments");
+                            dos.writeUTF("ERROR Missing arguments\n");
                             break;
                         }
 
