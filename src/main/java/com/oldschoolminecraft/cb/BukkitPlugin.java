@@ -23,30 +23,10 @@ public class BukkitPlugin extends JavaPlugin
         try
         {
             config = new PLConfig();
-            socket = new Socket(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort"));
-            dis = new DataInputStream(socket.getInputStream());
-            dos = new DataOutputStream(socket.getOutputStream());
 
-            System.out.println("Chat bridge connected to relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
+            loginRelay();
 
-            dos.writeUTF("LOGIN " + config.getStringOption("settings.chat.relaySecret") + "\n");
 
-            String auth_response = dis.readUTF();
-            if (auth_response.contains("LOGIN_SUCCESS"))
-            {
-                getServer().getScheduler().scheduleSyncRepeatingTask(this, () ->
-                {
-                    try
-                    {
-                        if (socket.isConnected()) dos.writeUTF("PING\n");
-                    } catch (Exception ignored) {}
-                }, 0,  1000); // 1000 ticks
-
-                getServer().getPluginManager().registerEvents(new PlayerHandler(this, socket, dis, dos), this);
-                System.out.println("Chat bridge authenticated with relay successfully");
-            } else {
-                System.out.println("Chat bridge failed to authenticate with relay");
-            }
 
 
         } catch (Exception ex) {
@@ -76,7 +56,9 @@ public class BukkitPlugin extends JavaPlugin
 
             if (args[0].equalsIgnoreCase("reload"))
             {
+                logoutRelay();
                 config.reload();
+                loginRelay();
                 sender.sendMessage("Chat bridge config reloaded");
                 return true;
             }
@@ -97,8 +79,55 @@ public class BukkitPlugin extends JavaPlugin
 
         try
         {
-            socket.close();
+            logoutRelay();
             System.out.println("Chat bridge has disconnected from relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void loginRelay()
+    {
+        try
+        {
+            socket = new Socket(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort"));
+            dis = new DataInputStream(socket.getInputStream());
+            dos = new DataOutputStream(socket.getOutputStream());
+
+            System.out.println("Chat bridge connected to relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
+
+            dos.writeUTF("LOGIN " + config.getStringOption("settings.chat.relaySecret"));
+
+            String auth_response = dis.readUTF();
+            if (auth_response.equals("LOGIN_SUCCESS"))
+            {
+                getServer().getScheduler().scheduleSyncRepeatingTask(this, () ->
+                {
+                    try
+                    {
+                        if (socket.isConnected()) dos.writeUTF("PING");
+                    } catch (Exception ignored) {}
+                }, 0,  1000); // 1000 ticks
+
+                getServer().getPluginManager().registerEvents(new PlayerHandler(this, socket, dis, dos), this);
+                System.out.println("Chat bridge authenticated with relay successfully");
+            } else {
+                System.out.println("Chat bridge failed to authenticate with relay");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void logoutRelay()
+    {
+        try
+        {
+            if (socket.isConnected())
+            {
+                dos.writeUTF("LOGOUT");
+                socket.close();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }

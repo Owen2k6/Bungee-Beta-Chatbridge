@@ -40,37 +40,47 @@ public class ProxyBridgeThread extends Thread
                 switch (split[0])
                 {
                     default:
-                        dos.writeUTF("ERROR Unknown command\n");
+                        dos.writeUTF("ERROR Unknown command");
                         break;
                     case "PING":
-                        dos.writeUTF("PONG\n");
+                        dos.writeUTF("PONG");
                         break;
                     case "LOGIN":
                         String secret = split[1];
+
                         if (secret.equals(plugin.config.getStringOption("settings.chat.relaySecret")))
                         {
+                            System.out.println("Relay LOGIN: " + socket.getInetAddress().getHostAddress());
                             loggedIn = true;
-                            dos.writeUTF("LOGIN_SUCCESS\n");
+                            dos.writeUTF("LOGIN_SUCCESS");
                         } else {
-                            dos.writeUTF("LOGIN_FAILED\n");
+                            System.out.println("Received bad login request from " + socket.getInetAddress().getHostAddress() + " with secret <" + secret + ">");
+                            System.out.println("Expected secret <" + plugin.config.getStringOption("settings.chat.relaySecret") + ">");
+                            dos.writeUTF("LOGIN_FAILED");
                         }
+                        break;
+                    case "LOGOUT":
+                        socket.close();
+                        System.out.println("Relay LOGOUT: " + socket.getInetAddress().getHostAddress());
                         break;
                     case "CHAT":
                         if (!loggedIn)
                         {
-                            dos.writeUTF("ERROR Not logged in\n");
+                            dos.writeUTF("ERROR Not logged in");
                             break;
                         }
 
                         if (split.length < 2)
                         {
-                            dos.writeUTF("ERROR Missing arguments\n");
+                            dos.writeUTF("ERROR Missing arguments");
                             break;
                         }
 
                         StringBuilder message = new StringBuilder();
                         for (int i = 1; i < split.length; i++)
                             message.append(split[i]).append(" ");
+
+                        System.out.println("Relay CHAT: " + message);
 
                         plugin.getProxy().getServers().values().forEach(server ->
                                 server.getPlayers().forEach(player ->

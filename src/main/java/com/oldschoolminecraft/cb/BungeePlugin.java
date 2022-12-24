@@ -1,11 +1,11 @@
 package com.oldschoolminecraft.cb;
 
 import com.oldschoolminecraft.cb.net.proxy.ConnectionHandlerThread;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
