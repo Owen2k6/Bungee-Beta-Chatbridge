@@ -10,6 +10,7 @@ import org.json.simple.parser.JSONParser;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ProxyBridgeThread extends Thread
 {
@@ -57,7 +58,8 @@ public class ProxyBridgeThread extends Thread
                             System.out.println("Relay LOGIN: " + socket.getInetAddress().getHostAddress());
                             loggedIn = true;
                             dos.writeUTF("LOGIN_SUCCESS");
-                        } else {
+                        } else
+                        {
                             System.out.println("Received bad login request from " + socket.getInetAddress().getHostAddress() + " with secret <" + secret + ">");
                             System.out.println("Expected secret <" + plugin.config.getStringOption("settings.chat.relaySecret") + ">");
                             dos.writeUTF("LOGIN_FAILED");
@@ -90,7 +92,7 @@ public class ProxyBridgeThread extends Thread
 
                         for (ServerInfo server : plugin.getProxy().getServers().values())
                         {
-                            if (server.getName().equals(serverName)) continue;
+                            if (server.getName().equalsIgnoreCase(serverName)) continue;
                             System.out.println("DEBUG: <" + server.getName() + "/" + serverName + ">");
                             for (ProxiedPlayer player : server.getPlayers())
                             {
@@ -102,6 +104,9 @@ public class ProxyBridgeThread extends Thread
                         break;
                 }
             }
+        } catch (SocketException ex) {
+            if (!ex.getMessage().contains("Socket closed") && !ex.getMessage().contains("Broken pipe"))
+                ex.printStackTrace();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
