@@ -1,6 +1,8 @@
 package com.oldschoolminecraft.cb.net.proxy;
 
 import com.oldschoolminecraft.cb.BungeePlugin;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.Server;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -74,13 +76,14 @@ public class ProxyBridgeThread extends Thread
                         for (int i = 1; i < split.length; i++)
                             message.append(split[i]).append(" ");
 
-                        System.out.println("Relay CHAT: " + message);
+                        System.out.println(String.format("Relay CHAT: [%s] %s", socket.getInetAddress().getHostAddress(), message));
 
-                        //
-
-                        plugin.getProxy().getServers().values().forEach(server ->
-                                server.getPlayers().forEach(player ->
-                                        player.sendMessage(message.toString())));
+                        for (ServerInfo server : plugin.getProxy().getServers().values())
+                        {
+                            if (server.getAddress().getAddress().getHostAddress().equals(socket.getInetAddress().getHostAddress()))
+                                continue;
+                            server.getPlayers().forEach(player -> player.sendMessage(message.toString()));
+                        }
                         break;
                 }
             }
