@@ -2,6 +2,3 @@ name: Bungee-Beta-Chatbridge
 author: "moderator_man & Owen2k6"
 version: 1.0
 main: com.oldschoolminecraft.cb.BungeePlugin
-commands:
-  chatbridge:
-    description: Main relay command

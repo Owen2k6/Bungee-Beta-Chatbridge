@@ -1,6 +1,7 @@
 package com.oldschoolminecraft.cb.net.proxy;
 
 import com.oldschoolminecraft.cb.BungeePlugin;
+import com.oldschoolminecraft.cb.Util;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -11,6 +12,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
 
 public class ProxyBridgeThread extends Thread
 {
@@ -93,12 +95,10 @@ public class ProxyBridgeThread extends Thread
                         for (ServerInfo server : plugin.getProxy().getServers().values())
                         {
                             if (server.getName().equalsIgnoreCase(serverName)) continue;
-                            System.out.println("DEBUG: <" + server.getName() + "/" + serverName + ">");
                             for (ProxiedPlayer player : server.getPlayers())
                             {
                                 if (player.getDisplayName().equals(displayName)) continue;
-                                System.out.println("DEBUG: <" + player.getDisplayName() + "/" + displayName + ">");
-                                player.sendMessage(message);
+                                sendMultiline(player, message);
                             }
                         }
                         break;
@@ -110,5 +110,12 @@ public class ProxyBridgeThread extends Thread
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void sendMultiline(ProxiedPlayer player, String message)
+    {
+        List<String> lines = Util.splitIntoChunks(message, 119);
+        for (String line : lines)
+            player.sendMessage(line);
     }
 }

@@ -1,7 +1,19 @@
 package com.oldschoolminecraft.cb;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Util
 {
+    public static List<String> splitIntoChunks(String text, int chunkSize)
+    {
+        String parsedText = translateAlternateColorCodes('&', text);
+        List<String> chunks = new ArrayList<>();
+        for (int i = 0; i < parsedText.length(); i += chunkSize)
+            chunks.add(parsedText.substring(i, Math.min(parsedText.length(), i + chunkSize)));
+        return chunks;
+    }
+
     public static String translateAlternateColorCodes(char altColorChar, String textToTranslate)
     {
         char[] b = textToTranslate.toCharArray();
