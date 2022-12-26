@@ -72,18 +72,23 @@ public class ProxyBridgeThread extends Thread
                             break;
                         }
 
-                        StringBuilder message = new StringBuilder();
-                        for (int i = 1; i < split.length; i++)
-                            message.append(split[i]).append(" ");
+                        String serverName = split[1];
+                        String displayName = split[2];
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 3; i < split.length; i++)
+                            sb.append(split[i]).append(" ");
 
-                        System.out.println(String.format("Relay CHAT: [%s] %s", socket.getInetAddress().getHostAddress(), message));
+                        System.out.println(String.format("Relay CHAT: [%s] <%s> %s", socket.getInetAddress().getHostAddress(), displayName, sb));
+
+                        String chatFormat = plugin.config.getStringOption("settings.chat.chatFormat");
+                        String message = chatFormat
+                                .replace("{server}", serverName)
+                                .replace("{player}", displayName)
+                                .replace("{message}", sb.toString().trim().replace("\n", ""));
 
                         for (ServerInfo server : plugin.getProxy().getServers().values())
-                        {
-                            if (server.getAddress().getAddress().getHostAddress().equals(socket.getInetAddress().getHostAddress()))
-                                continue;
-                            server.getPlayers().forEach(player -> player.sendMessage(message.toString()));
-                        }
+                            if (!server.getAddress().getAddress().getHostAddress().equals(socket.getInetAddress().getHostAddress()))
+                                server.getPlayers().forEach(player -> player.sendMessage(message));
                         break;
                 }
             }

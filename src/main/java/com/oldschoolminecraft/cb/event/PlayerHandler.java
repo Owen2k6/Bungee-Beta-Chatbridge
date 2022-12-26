@@ -32,7 +32,7 @@ public class PlayerHandler extends PlayerListener
     {
         try
         {
-            dos.writeUTF("CHAT " + event.getMessage());
+            dos.writeUTF(String.format("CHAT %s %s %s", plugin.config.getStringOption("settings.server.serverName"), event.getPlayer().getDisplayName(), event.getMessage()));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
