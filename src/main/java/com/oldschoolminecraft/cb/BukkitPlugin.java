@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class BukkitPlugin extends JavaPlugin
@@ -86,14 +87,18 @@ public class BukkitPlugin extends JavaPlugin
         }
     }
 
-    private void loginRelay()
+    public void loginRelay()
     {
         try
         {
-            socket = new Socket(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort"));
-            dis = new DataInputStream(socket.getInputStream());
-            dos = new DataOutputStream(socket.getOutputStream());
-
+            if (socket == null || dis == null || dos == null)
+            {
+                socket = new Socket(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort"));
+                dis = new DataInputStream(socket.getInputStream());
+                dos = new DataOutputStream(socket.getOutputStream());
+            } else {
+                socket.connect(new InetSocketAddress(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort")));
+            }
             System.out.println("Chat bridge connected to relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
 
             dos.writeUTF("LOGIN " + config.getStringOption("settings.chat.relaySecret"));
@@ -119,7 +124,7 @@ public class BukkitPlugin extends JavaPlugin
         }
     }
 
-    private void logoutRelay()
+    public void logoutRelay()
     {
         try
         {
