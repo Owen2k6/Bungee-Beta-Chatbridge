@@ -27,9 +27,7 @@ public class BukkitPlugin extends JavaPlugin
 
             loginRelay();
 
-
-
-
+            getServer().getPluginManager().registerEvents(new PlayerHandler(this), this);
         } catch (Exception ex) {
             System.out.println("Chat bridge failed to connect to relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
             System.out.println("Chat bridge has been disabled due to an error: " + ex.getMessage());
@@ -91,14 +89,9 @@ public class BukkitPlugin extends JavaPlugin
     {
         try
         {
-            if (socket == null || dis == null || dos == null)
-            {
-                socket = new Socket(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort"));
-                dis = new DataInputStream(socket.getInputStream());
-                dos = new DataOutputStream(socket.getOutputStream());
-            } else {
-                socket.connect(new InetSocketAddress(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort")));
-            }
+            socket = new Socket(config.getStringOption("settings.chat.relayHost"), (int) config.getConfigOption("settings.chat.relayPort"));
+            dis = new DataInputStream(socket.getInputStream());
+            dos = new DataOutputStream(socket.getOutputStream());
             System.out.println("Chat bridge connected to relay @ " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
 
             dos.writeUTF("LOGIN " + config.getStringOption("settings.chat.relaySecret"));
@@ -114,7 +107,6 @@ public class BukkitPlugin extends JavaPlugin
                     } catch (Exception ignored) {}
                 }, 0,  1000); // 1000 ticks
 
-                getServer().getPluginManager().registerEvents(new PlayerHandler(this, socket, dis, dos), this);
                 System.out.println("Chat bridge authenticated with relay successfully");
             } else {
                 System.out.println("Chat bridge failed to authenticate with relay");
@@ -129,12 +121,25 @@ public class BukkitPlugin extends JavaPlugin
         try
         {
             if (socket.isConnected())
-            {
                 dos.writeUTF("LOGOUT");
-                socket.close();
-            }
+            socket.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public Socket getSocket()
+    {
+        return socket;
+    }
+
+    public DataInputStream getDIS()
+    {
+        return dis;
+    }
+
+    public DataOutputStream getDOS()
+    {
+        return dos;
     }
 }

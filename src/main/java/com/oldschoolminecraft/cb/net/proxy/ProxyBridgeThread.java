@@ -2,6 +2,7 @@ package com.oldschoolminecraft.cb.net.proxy;
 
 import com.oldschoolminecraft.cb.BungeePlugin;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -38,6 +39,7 @@ public class ProxyBridgeThread extends Thread
             while (socket.isConnected())
             {
                 String rawMessage = dis.readUTF();
+                System.out.println("Relay Inbound RAW: <" + rawMessage + ">");
                 String[] split = rawMessage.split(" ");
                 switch (split[0])
                 {
@@ -87,8 +89,16 @@ public class ProxyBridgeThread extends Thread
                                 .replace("{message}", sb.toString().trim().replace("\n", ""));
 
                         for (ServerInfo server : plugin.getProxy().getServers().values())
-                            if (!server.getName().equals(serverName))
-                                server.getPlayers().forEach(player -> player.sendMessage(message));
+                        {
+                            if (server.getName().equals(serverName)) continue;
+                            System.out.println("DEBUG: <" + server.getName() + "/" + serverName + ">");
+                            for (ProxiedPlayer player : server.getPlayers())
+                            {
+                                if (player.getDisplayName().equals(displayName)) continue;
+                                System.out.println("DEBUG: <" + player.getDisplayName() + "/" + displayName + ">");
+                                player.sendMessage(message);
+                            }
+                        }
                         break;
                 }
             }

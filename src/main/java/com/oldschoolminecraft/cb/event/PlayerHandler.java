@@ -11,6 +11,7 @@ import org.json.simple.JSONObject;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class PlayerHandler extends PlayerListener
 {
@@ -19,12 +20,12 @@ public class PlayerHandler extends PlayerListener
     private DataInputStream dis;
     private DataOutputStream dos;
 
-    public PlayerHandler(BukkitPlugin plugin, Socket socket, DataInputStream dis, DataOutputStream dos)
+    public PlayerHandler(BukkitPlugin plugin)
     {
         this.plugin = plugin;
-        this.socket = socket;
-        this.dis = dis;
-        this.dos = dos;
+        this.socket = plugin.getSocket();
+        this.dis = plugin.getDIS();
+        this.dos = plugin.getDOS();
     }
 
     @EventHandler
@@ -33,9 +34,19 @@ public class PlayerHandler extends PlayerListener
         try
         {
             if (socket.isClosed())
+            {
                 plugin.loginRelay();
+                socket = plugin.getSocket();
+                dis = plugin.getDIS();
+                dos = plugin.getDOS();
+            }
 
-            dos.writeUTF(String.format("CHAT %s %s %s", plugin.config.getStringOption("settings.server.serverName"), event.getPlayer().getDisplayName(), event.getMessage()));
+            plugin.getDOS().writeUTF(String.format("CHAT %s %s %s", plugin.config.getStringOption("settings.server.serverName"), event.getPlayer().getDisplayName(), event.getMessage()));
+        } catch (SocketException ex) {
+            plugin.loginRelay();
+            socket = plugin.getSocket();
+            dis = plugin.getDIS();
+            dos = plugin.getDOS();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
