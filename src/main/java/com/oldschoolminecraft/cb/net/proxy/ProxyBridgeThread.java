@@ -87,7 +87,7 @@ public class ProxyBridgeThread extends Thread
                                 .replace("{message}", sb.toString().trim().replace("\n", ""));
 
                         for (ServerInfo server : plugin.getProxy().getServers().values())
-                            if (!server.getAddress().getAddress().getHostAddress().equals(socket.getInetAddress().getHostAddress()))
+                            if (!server.getName().equals(serverName))
                                 server.getPlayers().forEach(player -> player.sendMessage(message));
                         break;
                 }
