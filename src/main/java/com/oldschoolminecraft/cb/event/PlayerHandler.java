@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.json.simple.JSONObject;
 
 import java.io.DataInputStream;
@@ -13,15 +14,13 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class PlayerHandler extends PlayerListener
-{
+public class PlayerHandler extends PlayerListener {
     private BukkitPlugin plugin;
     private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
 
-    public PlayerHandler(BukkitPlugin plugin)
-    {
+    public PlayerHandler(BukkitPlugin plugin) {
         this.plugin = plugin;
         this.socket = plugin.getSocket();
         this.dis = plugin.getDIS();
@@ -29,12 +28,12 @@ public class PlayerHandler extends PlayerListener
     }
 
     @EventHandler
-    public void onPlayerChat(PlayerChatEvent event)
-    {
-        try
-        {
-            if (socket.isClosed())
-            {
+    public void onPlayerChat(PlayerChatEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        try {
+            if (socket.isClosed()) {
                 plugin.loginRelay();
                 socket = plugin.getSocket();
                 dis = plugin.getDIS();
@@ -50,5 +49,48 @@ public class PlayerHandler extends PlayerListener
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        try {
+            if (socket.isClosed()) {
+                plugin.loginRelay();
+                socket = plugin.getSocket();
+                dis = plugin.getDIS();
+                dos = plugin.getDOS();
+            }
+
+            plugin.getDOS().writeUTF(String.format("PJOIN %s %s", event.getPlayer().getDisplayName(), plugin.config.getStringOption("settings.server.serverName")));
+        } catch (SocketException ex) {
+            plugin.loginRelay();
+            socket = plugin.getSocket();
+            dis = plugin.getDIS();
+            dos = plugin.getDOS();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event) {
+        try {
+            if (socket.isClosed()) {
+                plugin.loginRelay();
+                socket = plugin.getSocket();
+                dis = plugin.getDIS();
+                dos = plugin.getDOS();
+            }
+
+            plugin.getDOS().writeUTF(String.format("PQUIT %s %s", event.getPlayer().getDisplayName(), plugin.config.getStringOption("settings.server.serverName")));
+        } catch (SocketException ex) {
+            plugin.loginRelay();
+            socket = plugin.getSocket();
+            dis = plugin.getDIS();
+            dos = plugin.getDOS();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
     }
 }

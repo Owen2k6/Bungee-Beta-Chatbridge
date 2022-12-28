@@ -27,6 +27,8 @@ public class PLConfig extends Configuration
         generateConfigOption("settings.chat.relayPort", 8182);
         generateConfigOption("settings.chat.relaySecret", Util.generateRandomString(32));
         generateConfigOption("settings.chat.chatFormat", "§7[§b{server}§7] §f{player}§7: §f{message}");
+        generateConfigOption("settings.chat.pjoinFormat", "§e{player} has connected to {server}");
+        generateConfigOption("settings.chat.pquitFormat", "§e{player} has left {server}");
         generateConfigOption("settings.server.serverName", "A Minecraft server");
     }
 
